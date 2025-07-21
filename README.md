@@ -4,3 +4,19 @@
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/sco1/cs-from-scratch/main.svg)](https://results.pre-commit.ci/latest/github/sco1/cs-from-scratch/main)
 
 Following along with David Kopec's [*Computer Science From Scratch*](https://nostarch.com/computer-science-from-scratch).
+
+## Differences From Text
+Initial implementations of each chapter's content will adhere as much as possible to the book's implementation, including inline and end-of-chapter exercises. Once the book's implementation is complete, I may occasionally indulge my own curiosity and expand on the concepts introduced.
+
+Significant differences in my implementations from the text are noted below.
+
+### All Chapters
+  * Each chapter is responsible for its own CLI and given a project-wide entry point rather than invoking via `python -m ...`
+  * Unit & integration testing is written using `pytest` rather than `unittest`. Additional tests are included to ensure full coverage for each chapter.
+
+### Chapter 1
+  * The `Brainfuck` interpreter class is initialized using a source string rather than a file path
+    * Use the `Brainfuck.from_file` method to load a source file
+  * The number of cells available to the interpreter can be optionally specified
+  * The `?>` prefix is used when prompting for input
+  * In addition to specifying a Brainfuck source file, a source string can also be passed to the CLI, e.g. `brainfuck -s ",>,[<.>-]"`

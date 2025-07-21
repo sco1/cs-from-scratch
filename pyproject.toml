@@ -1,6 +1,6 @@
 [project]
 name = "cs-from-scratch"
-version = "0.1.0"
+version = "1.0.0"
 description = "Following Along With David Kopec's Text"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -34,6 +34,9 @@ Repository = "https://github.com/sco1/cs-from-scratch.git"
 Issues = "https://github.com/sco1/cs-from-scratch/issues"
 Changelog = "https://github.com/sco1/cs-from-scratch/blob/main/CHANGELOG.md"
 
+[project.scripts]
+brainfuck = "cs_from_scratch.brainfuck:main"
+
 [tool.uv]
 dev-dependencies = [
     "black~=25.0",
@@ -47,7 +50,6 @@ dev-dependencies = [
     "pytest-cov~=6.0",
     "pytest-randomly~=3.16",
     "ruff~=0.9",
-    "sco1-bumper~=2.0",
     "tox~=4.23",
     "tox-uv~=1.17",
 ]

@@ -1,7 +1,0 @@
-[tool.bumper]
-current_version = "0.1.0"
-versioning_type = "semver"
-
-[[tool.bumper.files]]
-file = "./pyproject.toml"
-search = 'version = "{current_version}"'
