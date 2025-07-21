@@ -2,7 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from cs_from_scratch.brainfuck import Brainfuck, InvalidLoopError, clamp_int, parse_brackets
+from cs_from_scratch.Brainfuck.brainfuck import Brainfuck, InvalidLoopError, clamp_int, parse_brackets
+
+EXAMPLES_ROOT = Path("./examples/Brainfuck")
 
 OVERFLOW_TEST_CASES = (
     (0, 0),
@@ -56,9 +58,6 @@ def test_matched_bracket_no_open_raises() -> None:
 def test_cached_loop_no_close_raises() -> None:
     with pytest.raises(InvalidLoopError):
         _ = Brainfuck("[+++", cache_loops=True)
-
-
-EXAMPLES_ROOT = Path("./examples/brainfuck")
 
 
 def test_hello_world_cached_bracket(capsys: pytest.CaptureFixture) -> None:
