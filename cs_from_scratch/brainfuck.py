@@ -20,10 +20,36 @@ def clamp_int(num: int) -> int:
         return num
 
 
-class UnknownInstructionError(Exception): ...  # noqa: D101
+class InvalidLoopError(Exception): ...  # noqa: D101
 
 
-class InvalidJumpError(Exception): ...  # noqa: D101
+def parse_brackets(src: str) -> list[tuple[int, int]]:
+    """
+    Parse bracket pair opening & closing locations from the provided source.
+
+    e.g.:
+        * `,>,[<.>-]` -> `[(3, 8)]`
+        * `[++[--]<<]` -> `[(3, 6), (0, 9)]`
+    """
+    stack = []
+    matched = []
+    for idx, c in enumerate(src):
+        if c == "[":
+            stack.append(idx)
+        elif c == "]":
+            try:
+                open_idx = stack.pop()
+            except IndexError:
+                raise InvalidLoopError(
+                    f"Closing bracket at idx={idx} has no corresponding opening"
+                ) from None
+
+            matched.append((open_idx, idx))
+
+    if stack:
+        raise InvalidLoopError(f"Opening bracket(s) have no corresponding closure: idx={stack}")
+
+    return matched
 
 
 class Instruction(StrEnum):  # noqa: D101
@@ -45,12 +71,31 @@ class Brainfuck:  # noqa: D101
     _src: str
     _n_cells: int
 
-    def __init__(self, src: str, n_cells: int = 30_000) -> None:
+    _cache_loops: bool
+    _bracket_map: dict[int, int]
+
+    def __init__(self, src: str, n_cells: int = 30_000, cache_loops: bool = True) -> None:
         self._src = src
         self._n_cells = n_cells
 
+        self._cache_loops = cache_loops
+        if self._cache_loops:
+            self._map_brackets()
+
+    def _map_brackets(self) -> None:
+        """Map mapped bracket pairs to a dictionary for downstream lookup."""
+        matched = parse_brackets(self._src)
+
+        # Map the matched pairs in both directions so end can be looked up by the start & vice-versa
+        self._bracket_map = {}
+        for b_start, b_end in matched:
+            self._bracket_map[b_start] = b_end
+            self._bracket_map[b_end] = b_start
+
     @classmethod
-    def from_file(cls, filename: Path, n_cells: int = 30_000) -> Brainfuck:
+    def from_file(
+        cls, filename: Path, n_cells: int = 30_000, cache_loops: bool = True
+    ) -> Brainfuck:
         """
         Instantiate a Brainfuck program from the provided source file.
 
@@ -60,7 +105,7 @@ class Brainfuck:  # noqa: D101
         with open(filename, "r") as f:
             src = f.read().strip()
 
-        return cls(src, n_cells=n_cells)
+        return cls(src, n_cells=n_cells, cache_loops=cache_loops)
 
     def reset(self) -> None:  # noqa: D102
         self.cells = [0] * self._n_cells
@@ -97,7 +142,7 @@ class Brainfuck:  # noqa: D101
 
             loc += step
 
-        raise InvalidJumpError(f"No valid jump found (start: {start}, dir: {step})")
+        raise InvalidLoopError(f"No valid jump found (start: {start}, dir: {step})")
 
     def execute(self) -> None:
         """
@@ -132,10 +177,16 @@ class Brainfuck:  # noqa: D101
                     self.cells[self.cell_idx] = clamp_int(int(input("?> ")))
                 case Instruction.JUMP_IF_ZERO:
                     if self.cells[self.cell_idx] == 0:
-                        self.pointer = self.find_bracket_match(self.pointer, forward=True)
+                        if self._cache_loops:
+                            self.pointer = self._bracket_map[self.pointer]
+                        else:
+                            self.pointer = self.find_bracket_match(self.pointer, forward=True)
                 case Instruction.JUMP_IF_NONZERO:  # pragma: no branch
                     if self.cells[self.cell_idx] != 0:
-                        self.pointer = self.find_bracket_match(self.pointer, forward=False)
+                        if self._cache_loops:
+                            self.pointer = self._bracket_map[self.pointer]
+                        else:
+                            self.pointer = self.find_bracket_match(self.pointer, forward=False)
 
             self.pointer += 1
 

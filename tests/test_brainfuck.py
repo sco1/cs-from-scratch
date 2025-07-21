@@ -2,7 +2,7 @@ from pathlib import Path
 
 import pytest
 
-from cs_from_scratch.brainfuck import Brainfuck, InvalidJumpError, clamp_int
+from cs_from_scratch.brainfuck import Brainfuck, InvalidLoopError, clamp_int, parse_brackets
 
 OVERFLOW_TEST_CASES = (
     (0, 0),
@@ -31,17 +31,46 @@ def test_bracket_search(src: str, start: int, forward: bool, truth_out: int) -> 
     assert bf.find_bracket_match(start, forward=forward) == truth_out
 
 
-def test_bracket_search_no_close_raises() -> None:
-    bf = Brainfuck("[+++")
-    with pytest.raises(InvalidJumpError):
+def test_naive_bracket_search_no_close_raises() -> None:
+    bf = Brainfuck("[+++", cache_loops=False)
+    with pytest.raises(InvalidLoopError):
         bf.find_bracket_match(0, forward=True)
+
+
+MATCHED_BRACKETS_TEST_CASES = (
+    (",>,[<.>-]", [(3, 8)]),
+    ("[++[--]<<]", [(3, 6), (0, 9)]),
+)
+
+
+@pytest.mark.parametrize(("src", "truth_out"), MATCHED_BRACKETS_TEST_CASES)
+def test_matched_bracket_search(src: str, truth_out: list[tuple[int, int]]) -> None:
+    assert parse_brackets(src) == truth_out
+
+
+def test_matched_bracket_no_open_raises() -> None:
+    with pytest.raises(InvalidLoopError):
+        _ = parse_brackets("+++]")
+
+
+def test_cached_loop_no_close_raises() -> None:
+    with pytest.raises(InvalidLoopError):
+        _ = Brainfuck("[+++", cache_loops=True)
 
 
 EXAMPLES_ROOT = Path("./examples/brainfuck")
 
 
-def test_hello_world(capsys: pytest.CaptureFixture) -> None:
-    bf = Brainfuck.from_file(EXAMPLES_ROOT / "hello_world_verbose.bf")
+def test_hello_world_cached_bracket(capsys: pytest.CaptureFixture) -> None:
+    bf = Brainfuck.from_file(EXAMPLES_ROOT / "hello_world_verbose.bf", cache_loops=True)
+    bf.execute()
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Hello World!"
+
+
+def test_hello_world_naive_bracket(capsys: pytest.CaptureFixture) -> None:
+    bf = Brainfuck.from_file(EXAMPLES_ROOT / "hello_world_verbose.bf", cache_loops=False)
     bf.execute()
 
     captured = capsys.readouterr()
