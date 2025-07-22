@@ -51,10 +51,12 @@ ignore = [
 ]
 
 [lint.per-file-ignores]
-"tests/test_*.py" = [
+"tests/*/test_*.py" = [
     "D101",
     "D103",
 ]
+"cs_from_scratch/NanoBASIC/errors.py" = ["D101"]
+"cs_from_scratch/NanoBASIC/nodes.py" = ["D101"]
 
 [lint.flake8-bugbear]
 extend-immutable-calls = [

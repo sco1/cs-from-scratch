@@ -7,6 +7,13 @@ ASSOCIATED_VAL_T: t.TypeAlias = str | int | None
 
 
 class TokenType(Enum):
+    """
+    NanoBASIC's accepted token types.
+
+    Each token is enumerated as a tuple whose first component is the matching regular expression and
+    second component is whether the token has an associated value.
+    """
+
     COMMENT = (r"rem.*", False)
     WHITESPACE = (r"[ \t\n\r]", False)
     PRINT = (r"print", False)
@@ -41,8 +48,18 @@ class TokenType(Enum):
         return self.name
 
 
+BOOLEAN_OPERATORS = {
+    TokenType.GREATER,
+    TokenType.GREATER_EQUAL,
+    TokenType.EQUAL,
+    TokenType.NOT_EQUAL,
+    TokenType.LESS,
+    TokenType.LESS_EQUAL,
+}
+
+
 @dataclass(frozen=True)
-class Token:
+class Token:  # noqa: D101
     kind: TokenType
     lineno: int
     col_start: int
@@ -50,7 +67,7 @@ class Token:
     associated_value: ASSOCIATED_VAL_T
 
 
-def tokenize(src: t.TextIO) -> list[Token]:
+def tokenize(src: t.TextIO) -> list[Token]:  # noqa: D103
     tokens = []
     for lineno, line in enumerate(src.readlines(), start=1):
         col_start = 1
