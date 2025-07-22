@@ -1,3 +1,4 @@
+import ast
 from collections import deque
 
 from cs_from_scratch.NanoBASIC import nodes
@@ -122,7 +123,9 @@ class Interpreter:  # noqa: D101
                     if isinstance(p, nodes.NumericExpr):
                         comps.append(str(self._evaluate_numeric(p)))
                     else:  # printables should only be str or NumericExpr
-                        comps.append(p)
+                        # Probably not the best way to unescape any escaped quotes, but it works :)
+                        unescaped = ast.literal_eval(f"'{p}'")
+                        comps.append(unescaped)
 
                 print("\t".join(comps))
                 self.statement_idx += 1

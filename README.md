@@ -5,6 +5,8 @@
 
 Following along with David Kopec's [*Computer Science From Scratch*](https://nostarch.com/computer-science-from-scratch).
 
+The original source code for the text can be found in its [GitHub repository](https://github.com/davecom/ComputerScienceFromScratch).
+
 ## Differences From Text
 Initial implementations of each chapter's content will adhere as much as possible to the book's implementation, including inline and end-of-chapter exercises. Once the book's implementation is complete, I may occasionally indulge my own curiosity and expand on the concepts introduced.
 

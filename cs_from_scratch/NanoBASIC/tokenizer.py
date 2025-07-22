@@ -38,7 +38,7 @@ class TokenType(Enum):
     CLOSE_PAREN = (r"\)", False)
     VARIABLE = (r"[A-Za-z_]+", True)
     NUMBER = (r"-?[0-9]+", True)
-    STRING = (r'".*"', True)
+    STRING = (r'"(?:\\.|[^"\\])*"', True)
 
     def __init__(self, pattern: str, has_associated_value: bool) -> None:
         self.pattern = pattern
