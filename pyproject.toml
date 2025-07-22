@@ -36,6 +36,7 @@ Changelog = "https://github.com/sco1/cs-from-scratch/blob/main/CHANGELOG.md"
 
 [project.scripts]
 brainfuck = "cs_from_scratch.Brainfuck.brainfuck:main"
+NanoBASIC = "cs_from_scratch.NanoBASIC.cli:main"
 
 [tool.uv]
 dev-dependencies = [
@@ -59,7 +60,7 @@ line-length = 100
 
 [tool.isort]
 case_sensitive = true
-known_first_party = "cs-from-scratch,tests"
+known_first_party = "cs_from_scratch,tests"
 no_lines_before = "LOCALFOLDER"
 order_by_type = false
 profile = "black"

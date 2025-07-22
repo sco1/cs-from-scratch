@@ -1,5 +1,9 @@
+import re
+import typing as t
 from dataclasses import dataclass
 from enum import Enum
+
+ASSOCIATED_VAL_T: t.TypeAlias = str | int | None
 
 
 class TokenType(Enum):
@@ -43,4 +47,45 @@ class Token:
     lineno: int
     col_start: int
     col_end: int
-    associated_value: str | int | None
+    associated_value: ASSOCIATED_VAL_T
+
+
+def tokenize(src: t.TextIO) -> list[Token]:
+    tokens = []
+    for lineno, line in enumerate(src.readlines(), start=1):
+        col_start = 1
+        while len(line) > 0:
+            found = None
+            for tok in TokenType:
+                found = re.match(tok.pattern, line, re.IGNORECASE)
+                if found:
+                    col_end = col_start + found.end() - 1
+                    if (tok is not TokenType.WHITESPACE) and (tok is not TokenType.COMMENT):
+                        associated_value: ASSOCIATED_VAL_T = None
+                        if tok.has_associated_value:
+                            if tok is TokenType.NUMBER:
+                                associated_value = int(found.group(0))
+                            elif tok is TokenType.VARIABLE:
+                                associated_value = found.group()
+                            elif tok is TokenType.STRING:
+                                associated_value = found.group(0)[1:-1]
+
+                        tokens.append(
+                            Token(
+                                kind=tok,
+                                lineno=lineno,
+                                col_start=col_start,
+                                col_end=col_end,
+                                associated_value=associated_value,
+                            )
+                        )
+
+                    line = line[found.end() :]
+                    col_start = col_end + 1
+                    break
+
+            if not found:
+                print(f"{lineno}:{col_start} - Unknown token")
+                break
+
+    return tokens

@@ -192,7 +192,7 @@ class Brainfuck:  # noqa: D101
 
 
 def main() -> None:  # noqa: D103
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("brainfuck")
     parser.add_argument("filename", nargs="?", type=Path)
     parser.add_argument("-s", "--source_str")
     parser.add_argument("-c", "--cells", type=int, default=30_000)

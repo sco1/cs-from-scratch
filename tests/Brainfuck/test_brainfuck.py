@@ -2,7 +2,12 @@ from pathlib import Path
 
 import pytest
 
-from cs_from_scratch.Brainfuck.brainfuck import Brainfuck, InvalidLoopError, clamp_int, parse_brackets
+from cs_from_scratch.Brainfuck.brainfuck import (
+    Brainfuck,
+    InvalidLoopError,
+    clamp_int,
+    parse_brackets,
+)
 
 EXAMPLES_ROOT = Path("./examples/Brainfuck")
 
