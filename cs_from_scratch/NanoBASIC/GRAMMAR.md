@@ -5,8 +5,9 @@ NanoBASIC’s grammar is based on the original Tiny BASIC grammar published by D
 <statement> ::= 'PRINT' <expr-list> |
     'IF' <boolean-expr> 'THEN' <statement> |
     'GOTO' <expression> |
-    'LET' <var> '=' <expression> |
     'GOSUB' <expression> |
+    'INPUT' <var> |
+    'LET' <var> '=' <expression> |
     'RETURN'
 <expr-list> ::= (<string> | <expression>) (',' (<string> | <expression>))*
 <expression> ::= <term> (('+'|'-') <term>)*

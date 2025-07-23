@@ -49,6 +49,7 @@ dev-dependencies = [
     "pytest~=8.3",
     "pytest-check~=2.4",
     "pytest-cov~=6.0",
+    "pytest-mock~=3.14",
     "pytest-randomly~=3.16",
     "ruff~=0.9",
     "tox~=4.23",

@@ -23,6 +23,7 @@ class TokenType(Enum):
     GOTO = (r"goto", False)
     GOSUB = (r"gosub", False)
     RETURN_T = (r"return", False)
+    INPUT = (r"input", False)
     COMMA = (r",", False)
     EQUAL = (r"=", False)
     NOT_EQUAL = (r"<>|><", False)

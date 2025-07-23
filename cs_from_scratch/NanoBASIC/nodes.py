@@ -79,6 +79,11 @@ class ReturnStmt(Statement): ...
 
 
 @dataclass(frozen=True)
+class InputStmt(Statement):
+    name: str
+
+
+@dataclass(frozen=True)
 class PrintStmt(Statement):
     printables: list[str | NumericExpr]
 

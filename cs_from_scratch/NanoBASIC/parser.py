@@ -74,6 +74,8 @@ class Parser:
                 return self.parse_gosub(line_id)
             case TokenType.RETURN_T:
                 return self.parse_return(line_id)
+            case TokenType.INPUT:
+                return self.parse_input(line_id)
             case _:
                 raise ParserError("Expected to find start of statement", self.current)
 
@@ -255,6 +257,25 @@ class Parser:
             lineno=tok.lineno,
             col_start=tok.col_start,
             col_end=tok.col_end,
+        )
+
+    def parse_input(self, line_id: int) -> nodes.InputStmt:
+        """
+        Parse a NanoBASIC `INPUT` statement.
+
+        An `INPUT` statement binds a user input to a variable. Identifiers can be of arbitrary
+        length and composed of letters and underscores; all variables represent integers. The
+        `INPUT` keyword must be followed by a variable name, e.g. `10 INPUT A`
+        """
+        tok = self.consume(TokenType.INPUT)
+        var = self.consume(TokenType.VARIABLE)
+
+        return nodes.InputStmt(
+            line_id=line_id,
+            lineno=tok.lineno,
+            col_start=tok.col_start,
+            col_end=var.col_end,
+            name=t.cast(str, var.associated_value),
         )
 
     def parse_boolean_expression(self) -> nodes.BooleanExpr:

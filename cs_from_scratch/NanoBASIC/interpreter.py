@@ -117,6 +117,11 @@ class Interpreter:  # noqa: D101
                     raise InterpreterError("RETURN without GOSUB.", self.current)
 
                 self.statement_idx = self.subroutine_stack.pop()
+            case nodes.InputStmt(name=name):
+                val = int(input("?> "))
+                self.variable_table[name] = val
+
+                self.statement_idx += 1
             case nodes.PrintStmt(printables=printables):
                 comps = []
                 for p in printables:

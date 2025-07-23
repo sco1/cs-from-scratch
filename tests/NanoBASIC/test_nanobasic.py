@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import pytest
+from pytest_mock import MockerFixture
 
 from cs_from_scratch.NanoBASIC.runtime import NanoBASICRuntime
 
@@ -44,3 +45,22 @@ def test_escaped_quotes(tmp_path: Path, capsys: pytest.CaptureFixture) -> None:
 
     captured = capsys.readouterr()
     assert captured.out.strip() == 'This is "escaped"!'
+
+
+INPUT_SRC = """\
+10 INPUT A
+20 PRINT "Your input was:", A
+"""
+
+
+def test_user_input(tmp_path: Path, capsys: pytest.CaptureFixture, mocker: MockerFixture) -> None:
+    mocker.patch("cs_from_scratch.NanoBASIC.interpreter.input", return_value=42)
+
+    src_filepath = tmp_path / "src.bas"
+    src_filepath.write_text(INPUT_SRC)
+
+    runtime = NanoBASICRuntime(src_filepath)
+    runtime.execute()
+
+    captured = capsys.readouterr()
+    assert captured.out.strip() == "Your input was:\t42"
