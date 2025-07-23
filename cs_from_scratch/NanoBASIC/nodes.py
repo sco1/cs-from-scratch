@@ -79,11 +79,6 @@ class ReturnStmt(Statement): ...
 
 
 @dataclass(frozen=True)
-class InputStmt(Statement):
-    name: str
-
-
-@dataclass(frozen=True)
 class PrintStmt(Statement):
     printables: list[str | NumericExpr]
 
@@ -92,3 +87,28 @@ class PrintStmt(Statement):
 class IfStmt(Statement):
     boolean_expr: BooleanExpr
     then_stmt: Statement
+
+
+@dataclass(frozen=True)
+class InputStmt(Statement):
+    name: str
+
+
+@dataclass(frozen=True)
+class REPLClear(Statement): ...
+
+
+@dataclass(frozen=True)
+class REPLList(Statement): ...
+
+
+@dataclass(frozen=True)
+class REPLRun(Statement): ...
+
+
+@dataclass(frozen=True)
+class REPLEnd(Statement): ...
+
+
+REPL_NODES = {REPLClear, REPLList, REPLRun, REPLEnd}
+REPL_NODES_T = REPLClear | REPLList | REPLRun | REPLEnd

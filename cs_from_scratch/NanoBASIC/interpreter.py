@@ -139,6 +139,8 @@ class Interpreter:  # noqa: D101
                     self._interpret(then_stmt)
                 else:
                     self.statement_idx += 1
+            case nodes.REPLClear | nodes.REPLList | nodes.REPLRun | nodes.REPLEnd:
+                raise InterpreterError("REPL-only command: '{self.current}'.", self.current)
             case _:
                 raise InterpreterError(
                     f"Unexpected item: '{self.current}' in statement list.", self.current

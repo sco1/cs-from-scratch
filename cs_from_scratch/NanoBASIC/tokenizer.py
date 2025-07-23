@@ -1,7 +1,10 @@
+import io
 import re
 import typing as t
 from dataclasses import dataclass
 from enum import Enum
+
+from cs_from_scratch.NanoBASIC import errors
 
 ASSOCIATED_VAL_T: t.TypeAlias = str | int | None
 
@@ -16,14 +19,22 @@ class TokenType(Enum):
 
     COMMENT = (r"rem.*", False)
     WHITESPACE = (r"[ \t\n\r]", False)
+
     PRINT = (r"print", False)
     IF_T = (r"if", False)
     THEN = (r"then", False)
-    LET = (r"let", False)
     GOTO = (r"goto", False)
+    INPUT = (r"input", False)
+    LET = (r"let", False)
     GOSUB = (r"gosub", False)
     RETURN_T = (r"return", False)
-    INPUT = (r"input", False)
+
+    # For REPL only, do not get nodes
+    CLEAR = (r"clear", False)
+    LIST = (r"list", False)
+    RUN = (r"run", False)
+    END = (r"end", False)
+
     COMMA = (r",", False)
     EQUAL = (r"=", False)
     NOT_EQUAL = (r"<>|><", False)
@@ -58,6 +69,13 @@ BOOLEAN_OPERATORS = {
     TokenType.LESS_EQUAL,
 }
 
+REPL_ONLY = {
+    TokenType.CLEAR,
+    TokenType.LIST,
+    TokenType.RUN,
+    TokenType.END,
+}
+
 
 @dataclass(frozen=True)
 class Token:  # noqa: D101
@@ -68,9 +86,16 @@ class Token:  # noqa: D101
     associated_value: ASSOCIATED_VAL_T
 
 
-def tokenize(src: t.TextIO) -> list[Token]:  # noqa: D103
+def tokenize(src: t.TextIO | str) -> list[Token]:  # noqa: D103
+    if isinstance(src, io.IOBase):
+        src_lines = src.readlines()
+    elif isinstance(src, str):
+        src_lines = src.splitlines()
+    else:
+        raise ValueError()
+
     tokens = []
-    for lineno, line in enumerate(src.readlines(), start=1):
+    for lineno, line in enumerate(src_lines, start=1):
         col_start = 1
         while len(line) > 0:
             found = None
@@ -103,7 +128,6 @@ def tokenize(src: t.TextIO) -> list[Token]:  # noqa: D103
                     break
 
             if not found:
-                print(f"{lineno}:{col_start} - Unknown token")
-                break
+                raise errors.TokenizationError("Unknown token.", lineno=lineno, col=col_start)
 
     return tokens

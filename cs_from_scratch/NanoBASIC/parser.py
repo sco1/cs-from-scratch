@@ -2,7 +2,7 @@ import typing as t
 
 from cs_from_scratch.NanoBASIC import nodes
 from cs_from_scratch.NanoBASIC.errors import ParserError
-from cs_from_scratch.NanoBASIC.tokenizer import BOOLEAN_OPERATORS, Token, TokenType
+from cs_from_scratch.NanoBASIC.tokenizer import BOOLEAN_OPERATORS, REPL_ONLY, Token, TokenType
 
 
 class Parser:
@@ -56,8 +56,14 @@ class Parser:
 
         The leading line number is parsed & then further parsing is passed to the statement parser.
         """
-        line_id = self.consume(TokenType.NUMBER)
-        return self.parse_statement(t.cast(int, line_id.associated_value))
+        if self.current.kind in REPL_ONLY:
+            # Give REPL commands a dummy line number so we don't have to go nuts on the parser
+            line_id = -1
+        else:
+            line_id_tok = self.consume(TokenType.NUMBER)
+            line_id = t.cast(int, line_id_tok.associated_value)
+
+        return self.parse_statement(line_id)
 
     def parse_statement(self, line_id: int) -> nodes.Statement:
         """Parse the line's remaining token(s) into a `Statement` node."""
@@ -76,6 +82,15 @@ class Parser:
                 return self.parse_return(line_id)
             case TokenType.INPUT:
                 return self.parse_input(line_id)
+            # REPL-only commands don't have any need for a line number
+            case TokenType.CLEAR:
+                return self.parse_clear()
+            case TokenType.LIST:
+                return self.parse_list()
+            case TokenType.RUN:
+                return self.parse_run()
+            case TokenType.END:
+                return self.parse_end()
             case _:
                 raise ParserError("Expected to find start of statement", self.current)
 
@@ -407,3 +422,47 @@ class Parser:
                 )
             case _:
                 raise ParserError("Unexpected token in numeric expression.", self.current)
+
+    def parse_clear(self) -> nodes.REPLClear:
+        """
+        Parse a NanoBASIC `CLEAR` statement.
+
+        This is intended as a REPL-only command.
+        """
+        tok = self.consume(TokenType.CLEAR)
+        return nodes.REPLClear(
+            lineno=tok.lineno, col_start=tok.col_start, col_end=tok.col_end, line_id=-1
+        )
+
+    def parse_list(self) -> nodes.REPLList:
+        """
+        Parse a NanoBASIC `LIST` statement.
+
+        This is intended as a REPL-only command.
+        """
+        tok = self.consume(TokenType.LIST)
+        return nodes.REPLList(
+            lineno=tok.lineno, col_start=tok.col_start, col_end=tok.col_end, line_id=-1
+        )
+
+    def parse_run(self) -> nodes.REPLRun:
+        """
+        Parse a NanoBASIC `RUN` statement.
+
+        This is intended as a REPL-only command.
+        """
+        tok = self.consume(TokenType.RUN)
+        return nodes.REPLRun(
+            lineno=tok.lineno, col_start=tok.col_start, col_end=tok.col_end, line_id=-1
+        )
+
+    def parse_end(self) -> nodes.REPLEnd:
+        """
+        Parse a NanoBASIC `END` statement.
+
+        This is intended as a REPL-only command.
+        """
+        tok = self.consume(TokenType.END)
+        return nodes.REPLEnd(
+            lineno=tok.lineno, col_start=tok.col_start, col_end=tok.col_end, line_id=-1
+        )
