@@ -38,6 +38,7 @@ Changelog = "https://github.com/sco1/cs-from-scratch/blob/main/CHANGELOG.md"
 brainfuck = "cs_from_scratch.Brainfuck.brainfuck:main"
 NanoBASIC = "cs_from_scratch.NanoBASIC.cli:main"
 RetroDither = "cs_from_scratch.RetroDither.cli:main"
+Impressionist = "cs_from_scratch.Impressionist.cli:main"
 
 [tool.uv]
 dev-dependencies = [
