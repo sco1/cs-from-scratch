@@ -14,7 +14,7 @@ class PatternPart(t.NamedTuple):  # noqa: D101
     denominator: int
 
 
-# Atkinson dithering error diffusion
+# Atkinson error diffusion
 #      -1  0   1   2
 # -------------------
 # 0 |      X  1/8 1/8
@@ -29,7 +29,7 @@ ATKINSON = [
     PatternPart(dc=0, dr=2, numerator=1, denominator=8),
 ]
 
-# Floyd-Steinberg dithering error diffusion
+# Floyd-Steinberg error diffusion
 #      -1   0     1
 # ------------------
 # 0 |       X   7/16
@@ -40,6 +40,33 @@ FLOYD_STEINBERG = [
     PatternPart(dc=0, dr=1, numerator=5, denominator=16),
     PatternPart(dc=1, dr=1, numerator=1, denominator=16),
 ]
+
+# Jarvis, Judice, and Ninke error diffusion
+#      -2   -1   0    1    2
+# ----------------------------
+# 0 |            X   7/48 5/48
+# 1 | 3/48 5/48 7/48 5/48 3/48
+# 2 | 1/48 3/48 5/48 3/48 1/48
+JARVIS_JUDICE_NINKE = [
+    PatternPart(dc=1, dr=0, numerator=7, denominator=48),
+    PatternPart(dc=2, dr=0, numerator=5, denominator=48),
+    PatternPart(dc=-2, dr=1, numerator=3, denominator=48),
+    PatternPart(dc=-1, dr=1, numerator=5, denominator=48),
+    PatternPart(dc=0, dr=1, numerator=7, denominator=48),
+    PatternPart(dc=1, dr=1, numerator=5, denominator=48),
+    PatternPart(dc=2, dr=1, numerator=3, denominator=48),
+    PatternPart(dc=-2, dr=2, numerator=1, denominator=48),
+    PatternPart(dc=-1, dr=2, numerator=3, denominator=48),
+    PatternPart(dc=0, dr=2, numerator=5, denominator=48),
+    PatternPart(dc=1, dr=2, numerator=3, denominator=48),
+    PatternPart(dc=2, dr=2, numerator=1, denominator=48),
+]
+
+DITHER_MAPPING = {
+    "atkinson": ATKINSON,
+    "floyd-steinberg": FLOYD_STEINBERG,
+    "jjn": JARVIS_JUDICE_NINKE,
+}
 
 
 def dither(
