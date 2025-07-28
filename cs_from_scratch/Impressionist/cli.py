@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+from cs_from_scratch.Impressionist.impressionist import ColorMethod, ShapeType
+
 
 def main() -> None:  # noqa: D103
     parser = argparse.ArgumentParser("Impressionist")
@@ -9,15 +11,17 @@ def main() -> None:  # noqa: D103
     parser.add_argument(
         "-m",
         "--method",
-        choices=["random", "average", "common"],
-        default="average",
+        type=ColorMethod,
+        choices=ColorMethod,
+        default=ColorMethod.AVERAGE,
         help="Method for determining shape colors.",
     )
     parser.add_argument(
         "-s",
         "--shape",
-        choices=["ellipse", "triangle", "quadrilateral", "line"],
-        default="ellipse",
+        type=ShapeType,
+        choices=ShapeType,
+        default=ShapeType.ELLIPSE,
         help="Base shape type.",
     )
     parser.add_argument(
