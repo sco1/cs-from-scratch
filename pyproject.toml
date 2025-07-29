@@ -40,6 +40,7 @@ brainfuck = "cs_from_scratch.Brainfuck.brainfuck:main"
 NanoBASIC = "cs_from_scratch.NanoBASIC.cli:main"
 RetroDither = "cs_from_scratch.RetroDither.cli:main"
 Impressionist = "cs_from_scratch.Impressionist.cli:main"
+Chip8 = "cs_from_scratch.Chip8.cli:main"
 
 [tool.uv]
 dev-dependencies = [
