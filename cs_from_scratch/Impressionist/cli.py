@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 
-from cs_from_scratch.Impressionist.impressionist import ColorMethod, ShapeType
+from cs_from_scratch.Impressionist.impressionist import ColorMethod, Impressionist, ShapeType
 
 
 def main() -> None:  # noqa: D103
@@ -36,6 +36,17 @@ def main() -> None:  # noqa: D103
         help="If >0, create an animated GIF of n ms per frame.",
     )
     args = parser.parse_args()
+
+    impr = Impressionist(
+        img_filepath=args.input_img,
+        n_trials=args.trials,
+        method=args.method,
+        shape_type=args.shape,
+        length=args.length,
+        vector=args.vector,
+        animation_length=args.animate,
+    )
+    impr.run_trials()
 
 
 if __name__ == "__main__":  # noqa: D103
