@@ -69,9 +69,27 @@ class Header(t.NamedTuple):
 
 
 class ROM:
+    """
+    NROM cartridge emulation.
+
+    For this console, only iNES (or similar) ROMs that use mapper `0` are supported.
+
+    Assumed characteristics of mapper `0` ROMs are:
+        * No bank switching
+        * Either 16KB or 32 KB of PRG ROM
+        * 8KB of CHR ROM
+        * Can optionally have PRG RAM
+
+    Though only mapper `0` is currently supported, the `ROM` class exposes generic `read_cartridge`
+    and `write_cartridge` methods that handle read/write operations for the cartridge based on the
+    mapper type.
+    """
+
     prg_rom: bytes
     chr_rom: bytes
     prg_ram: array[int]
+
+    vertical_mirroring: bool
 
     read_cartridge: t.Callable[[int], int]
     write_cartridge: t.Callable[[int, int], None]
@@ -91,12 +109,12 @@ class ROM:
             print(f"Mapper {self.mapper}")
 
             if self.mapper != 0:
-                raise ValueError("Invalid Mapper: Only Mapper 0 is implemented")
+                print(f"Invalid Mapper: Only Mapper 0 is implemented, got {self.mapper}")
 
             # Though only one mapper is currently supported, use a generic method wrapping to
             # support potential future expansion
-            self.read_cartridge = self.read_mapper0
-            self.write_cartridge = self.write_mapper0
+            self.read_cartridge = self._read_mapper0
+            self.write_cartridge = self._write_mapper0
 
             # Check if there's a trainer (4th bit in Flags 6) and read it
             self.trainer_data: bytes | None
@@ -118,7 +136,15 @@ class ROM:
 
             self.prg_ram = array("B", [0] * PRG_RAM_SIZE)
 
-    def read_mapper0(self, addr: int) -> int:
+    def _read_mapper0(self, addr: int) -> int:
+        """
+        Read from cartridge memory, assuming mapper `0`.
+
+        For mapper `0`:
+            * Addresses below `0x2000` are mapped to CHR ROM, accessed by PPU
+            * Addresses greater than or equal to `0x8000` are PRG ROM, accessed by CPU
+            * Addresses greater than or equal to `0x6000` but below `0x8000` are mapped to PRG RAM
+        """
         if addr < 0x2000:  # CHR ROM
             return self.chr_rom[addr]
         elif 0x6000 <= addr < 0x8000:  # PRG RAM
@@ -131,6 +157,13 @@ class ROM:
         else:
             raise LookupError(f"Tried to read at invalid address: {addr:X}")
 
-    def write_mapper0(self, addr: int, val: int) -> None:
-        if addr >= 0x6000:
+    def _write_mapper0(self, addr: int, val: int) -> None:
+        """
+        Write to cartridge memory, assuming mapper `0`.
+
+        If the cartridge has PRG RAM, its addresses are mapped to `[0x6000, 0x8000)`.
+        """
+        if 0x6000 <= addr < 0x8000:
             self.prg_ram[addr % PRG_RAM_SIZE] = val
+        else:
+            raise ValueError(f"Attemped to write to read-only address: {addr:X}")

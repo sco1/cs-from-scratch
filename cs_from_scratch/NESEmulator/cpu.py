@@ -17,6 +17,8 @@ MEM_SIZE = 2048  # Size of NES RAM accessible by the CPU
 
 
 class MemMode(IntEnum):
+    """Memory access schemes for the 6502 processor."""
+
     DUMMY = 1
     ABSOLUTE = 2
     ABSOLUTE_X = 3
@@ -34,6 +36,8 @@ class MemMode(IntEnum):
 
 
 class InstructionType(IntEnum):
+    """Instruction types for the 6502 processor."""
+
     ADC = 1
     AHX = 2
     ALR = 3
@@ -125,6 +129,18 @@ BRANCH_INSTRUCTIONS = {
 
 @dataclass(frozen=True)
 class Instruction:
+    """
+    6502 Instruction container, for use in downstream jump table.
+
+    The contained fields are:
+        * `type` - Opcode
+        * `method` - Associated `CPU` method
+        * `mode` - Memory access mode
+        * `length` - Expected number of bytes
+        * `ticks` - Number of CPU cycles to run
+        * `page_ticks` - Additional CPU cycles if memory page is crossed during execution
+    """
+
     type: InstructionType
     method: t.Callable[[Instruction, int], None]
     mode: MemMode
@@ -135,6 +151,13 @@ class Instruction:
 
 @dataclass
 class Joypad:
+    """
+    Represent the state of a joypad during program execution.
+
+    While the CPU directly polls the joypad through memory-mapped registers, for convenience it is
+    broken into its own class since we are using Pygame events to set its state.
+    """
+
     strobe: bool = False
     read_count: int = 0
     a: bool = False
@@ -148,6 +171,11 @@ class Joypad:
 
 
 class CPU:
+    """Emulation of the NES' 6502 processor."""
+
+    cpu_ticks: int
+    joypad1: Joypad
+
     def __init__(self, ppu: PPU, rom: ROM) -> None:
         # Connections to other console parts
         self.ppu = ppu
@@ -185,6 +213,10 @@ class CPU:
         self._set_instructions()
 
     def step(self) -> None:
+        """Execute the next opcode from the current program counter position."""
+        # Emulate waiting for long-running task to complete
+        # In this implementation, this is usually when a transfer occurs between main memory to
+        # the PPU's object attribute memory
         if self.stall > 0:
             self.stall -= 1
             self.cpu_ticks += 1
@@ -392,6 +424,7 @@ class CPU:
         self.N = bool(tmp & 0b10000000)
 
     def trigger_NMI(self) -> None:
+        """Process non-maskable interrupt (NMI)."""
         self._stack_push((self.PC >> 8) & 0xFF)
         self._stack_push(self.PC & 0xFF)
 
@@ -412,12 +445,12 @@ class CPU:
         instruction = self.instructions[opcode]
 
         if instruction.length < 2:
-            data1 = " "
+            data1 = "  "
         else:
             data1 = f"{self._read_memory(self.PC + 1, MemMode.ABSOLUTE):02X}"
 
         if instruction.length < 3:
-            data2 = " "
+            data2 = "  "
         else:
             data2 = f"{self._read_memory(self.PC + 2, MemMode.ABSOLUTE):02X}"
 
@@ -731,14 +764,14 @@ class CPU:
 
     def _BCS(self, instruction: Instruction, data: int) -> None:
         """Branch if carry clear."""
-        if not self.C:
+        if self.C:
             self.PC = self._address_for_mode(data, instruction.mode)
             self.jumped = True
 
     def _BEQ(self, instruction: Instruction, data: int) -> None:
         """Branch on result zero."""
         if self.Z:
-            self.pc = self._address_for_mode(data, instruction.mode)
+            self.PC = self._address_for_mode(data, instruction.mode)
             self.jumped = True
 
     def _BIT(self, instruction: Instruction, data: int) -> None:

@@ -9,6 +9,7 @@ from cs_from_scratch.NESEmulator.rom import ROM
 
 
 def run(rom: ROM, name: str) -> None:
+    """Pygame entry point for the NES Emulator."""
     pygame.init()
     screen = pygame.display.set_mode((NES_WIDTH, NES_HEIGHT), 0, 24)
     pygame.display.set_caption(f"NES EMulator - {name}")
