@@ -176,6 +176,8 @@ class CPU:
     cpu_ticks: int
     joypad1: Joypad
 
+    instructions: tuple[Instruction, ...]
+
     def __init__(self, ppu: PPU, rom: ROM) -> None:
         # Connections to other console parts
         self.ppu = ppu

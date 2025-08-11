@@ -7,23 +7,27 @@ Following along with David Kopec's [*Computer Science From Scratch*](https://nos
 
 The original source code for the text can be found in its [GitHub repository](https://github.com/davecom/ComputerScienceFromScratch).
 
-## Differences From Text
+# Differences From Text
 Initial implementations of each chapter's content will adhere as much as possible to the book's implementation, including inline and end-of-chapter exercises. Once the book's implementation is complete, I may occasionally indulge my own curiosity and expand on the concepts introduced.
 
 Significant differences in my implementations from the text are noted below.
 
-### All Chapters
-  * Each chapter is responsible for its own CLI and given a project-wide entry point rather than invoking via `python -m ...`
-    * Chapter 1: `brainfuck`
-    * Chapter 2: `NanoBASIC`
-  * Unit & integration testing is written using `pytest` rather than `unittest`. Additional tests are included to ensure full coverage for each chapter.
+## All Chapters
+* Each chapter is responsible for its own CLI and given a project-wide entry point rather than invoking via `python -m ...`
+  * Chapter 1: `brainfuck`
+  * Chapter 2: `NanoBASIC`
+  * Chapter 3: `RetroDither`
+  * Chapter 4: `Impressionist`
+  * Chapter 5: `Chip8`
+  * Chapter 6: `NESEmulator`
+* Unit & integration testing is written using `pytest` rather than `unittest`. Additional tests maybe be included to maximize feasible coverage for each chapter.
 
-### Chapter 1
-  * The `Brainfuck` interpreter class is initialized using a source string rather than a file path
-    * Use the `Brainfuck.from_file` method to load a source file
-  * The number of cells available to the interpreter can be optionally specified
-  * The `?>` prefix is used when prompting for input
-  * In addition to specifying a Brainfuck source file, a source string can also be passed to the CLI, e.g. `brainfuck -s ",>,[<.>-]"`
+## Chapter 1
+* The `Brainfuck` interpreter class is initialized using a source string rather than a file path
+  * Use the `Brainfuck.from_file` method to load a source file
+* The number of cells available to the interpreter can be optionally specified
+* The `?>` prefix is used when prompting for input
+* In addition to specifying a Brainfuck source file, a source string can also be passed to the CLI, e.g. `brainfuck -s ",>,[<.>-]"`
 
-### Chapter 2
-  * A `--dump_ast` CLI option is provided to write the AST to a `<filename>_AST.txt` file in the same directory as the loaded source file
+## Chapter 2
+* A `--dump_ast` CLI option is provided to write the AST to a `<filename>_AST.txt` file in the same directory as the loaded source file
