@@ -1,5 +1,7 @@
 import csv
 
+import pytest
+
 from cs_from_scratch.KNN.digit import Digit
 from cs_from_scratch.KNN.fish import Fish
 from cs_from_scratch.KNN.knn import KNN
@@ -32,6 +34,15 @@ def test_classify() -> None:
 
     classify_fish = fish_knn.classify(k=k, data_point=test_fish)
     assert classify_fish == "Parkki"
+
+
+def test_predict() -> None:
+    k = 5
+    fish_knn = KNN(Fish, FISH_CSV)
+    test_fish = Fish("", 0.0, 20.0, 23.5, 24.0, 10.0, 4.0)
+
+    predict_fish = fish_knn.predict(k, test_fish, "weight")
+    assert predict_fish == pytest.approx(165.0)
 
 
 DIGITS_DATA_CSV = TEST_DATA_DIR / "digits" / "digits.csv"
