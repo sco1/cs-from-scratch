@@ -49,15 +49,13 @@ class KNN[DP: DataPoint]:
     def predict(self, k: int, data_point: DP, property_name: str) -> float:
         """Predict a property of the query point according to the `k` nearest data points."""
         neighbors = self.nearest(k, data_point)
-        predicted = sum([getattr(neighbor, property_name) for neighbor in neighbors]) / len(
-            neighbors
-        )
-        return predicted  # type: ignore[no-any-return]
 
-    def predict_array(self, k: int, data_point: DP, property_name: str) -> np.ndarray:
-        """Predict a numpy array property of the query point via the `k` nearest data points."""
-        neighbors = self.nearest(k, data_point)
-        predicted = np.sum(
-            [getattr(neighbor, property_name) for neighbor in neighbors], axis=0
-        ) / len(neighbors)
+        if isinstance(getattr(neighbors[0], property_name), np.ndarray):
+            predicted = np.sum(
+                [getattr(neighbor, property_name) for neighbor in neighbors], axis=0
+            ) / len(neighbors)
+        else:
+            predicted = sum([getattr(neighbor, property_name) for neighbor in neighbors]) / len(
+                neighbors
+            )
         return predicted  # type: ignore[no-any-return]
